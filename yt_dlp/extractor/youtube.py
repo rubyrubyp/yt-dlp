@@ -609,6 +609,19 @@ class YoutubeBaseInfoExtractor(InfoExtractor):
     def extract_yt_initial_data(self, item_id, webpage, fatal=True):
         return self._search_json(self._YT_INITIAL_DATA_RE, webpage, 'yt initial data', item_id, fatal=fatal)
 
+    def extract_live_start_time(self, video_id):
+        player_ytcfg = self._get_default_ytcfg()
+        query = { 'videoId': video_id }
+        player_response = self._extract_response(
+            item_id=video_id, ep='player', fatal=False,
+            note=False, ytcfg=player_ytcfg, query=query,
+            headers=self.generate_api_headers(ytcfg=player_ytcfg))
+
+        timestamp_path = ('microformat', 'playerMicroformatRenderer', 'liveBroadcastDetails', 'startTimestamp')
+        live_start_time = parse_iso8601(traverse_obj(player_response, timestamp_path, get_all=False))
+
+        return int_or_none(live_start_time, invscale=1000)
+
     @staticmethod
     def _extract_session_index(*data):
         """
