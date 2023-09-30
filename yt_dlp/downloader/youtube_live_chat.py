@@ -35,7 +35,7 @@ class YoutubeLiveChatFD(FragmentFD):
 
         ie = YoutubeBaseInfoExtractor(self.ydl)
 
-        start_time = int(time.time() * 1000)
+        start_time = ie.extract_live_start_time(video_id) or int(time.time() * 1000)
 
         def dl_fragment(url, data=None, headers=None):
             http_headers = HTTPHeaderDict(info_dict.get('http_headers'), headers)
