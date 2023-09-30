@@ -93,11 +93,6 @@ class CookieLoadError(YoutubeDLError):
 def load_cookies(cookie_file, browser_specification, ydl):
     try:
         cookie_jars = []
-        if browser_specification is not None:
-            browser_name, profile, keyring, container = _parse_browser_specification(*browser_specification)
-            cookie_jars.append(
-                extract_cookies_from_browser(browser_name, profile, YDLLogger(ydl), keyring=keyring, container=container))
-
         if cookie_file is not None:
             is_filename = is_path_like(cookie_file)
             if is_filename:
@@ -107,6 +102,11 @@ def load_cookies(cookie_file, browser_specification, ydl):
             if not is_filename or os.access(cookie_file, os.R_OK):
                 jar.load()
             cookie_jars.append(jar)
+        
+        if browser_specification is not None:
+            browser_name, profile, keyring, container = _parse_browser_specification(*browser_specification)
+            cookie_jars.append(
+                extract_cookies_from_browser(browser_name, profile, YDLLogger(ydl), keyring=keyring, container=container))
 
         return _merge_cookie_jars(cookie_jars)
     except Exception:
